@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>鮮市集 — 每日新鮮直送</title>
+<title>點紅 Point Red — 生鮮直送到家</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
   :root {
@@ -41,7 +41,7 @@
   .filter-btn{border:1px solid var(--border);background:var(--card);border-radius:99px;padding:6px 16px;font-size:13px;cursor:pointer;color:var(--muted);font-family:inherit;transition:all .15s}
   .filter-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
   /* PRODUCT GRID */
-  .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+  .product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
   .product-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;position:relative}
   .product-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
   .product-card .emoji{font-size:44px;text-align:center;display:block;margin-bottom:10px}
@@ -146,7 +146,7 @@
 <body>
 
 <nav class="nav">
-  <div class="logo">🌿 鮮<span>市集</span></div>
+  <div class="logo">🔴 點紅<span> Point Red</span></div>
   <div class="nav-right">
     <button class="btn" onclick="show('shop')">🏠 首頁</button>
     <button class="btn" onclick="show('login')">👤 登入</button>
@@ -158,8 +158,8 @@
 <div id="page-shop" class="page active">
   <div class="hero">
     <div>
-      <h1>每日新鮮直送到家 🚚</h1>
-      <p>精選台灣在地農場蔬果、海鮮與肉品，當日採收、當日出貨，新鮮保證。</p>
+      <h1>點紅生鮮，直送到家 🚚</h1>
+      <p>Point Red 精選台灣在地農場蔬果、海鮮與肉品，當日採收、當日出貨，新鮮保證。</p>
     </div>
     <div class="hero-icon">🥦</div>
   </div>
@@ -304,296 +304,179 @@
 </div>
 
 <script>
-// ========== 資料 ==========
-let products = [
-  {id:1,name:'有機花椰菜',emoji:'🥦',price:65,stock:15,cat:'蔬菜',unit:'1顆/約500g',status:'active'},
-  {id:2,name:'玉米筍',emoji:'🌽',price:45,stock:8,cat:'蔬菜',unit:'1包/250g',status:'active'},
-  {id:3,name:'牛番茄',emoji:'🍅',price:55,stock:20,cat:'蔬菜',unit:'1袋/約600g',status:'active'},
-  {id:4,name:'甜心蘋果',emoji:'🍎',price:120,stock:12,cat:'水果',unit:'6顆裝',status:'active'},
-  {id:5,name:'愛文芒果',emoji:'🥭',price:160,stock:5,cat:'水果',unit:'3顆裝',status:'active'},
-  {id:6,name:'香蕉',emoji:'🍌',price:50,stock:0,cat:'水果',unit:'1串/約700g',status:'active'},
-  {id:7,name:'鮭魚切片',emoji:'🐟',price:280,stock:10,cat:'海鮮',unit:'2片/約300g',status:'active'},
-  {id:8,name:'白蝦',emoji:'🦐',price:220,stock:6,cat:'海鮮',unit:'1盒/300g',status:'active'},
-  {id:9,name:'松阪豬',emoji:'🥩',price:320,stock:4,cat:'肉品',unit:'1份/300g',status:'active'},
-  {id:10,name:'雞胸肉',emoji:'🍗',price:180,stock:18,cat:'肉品',unit:'2片/約400g',status:'active'},
-];
-let orders = [
-  {id:'#0001',name:'陳小華',phone:'0912-345-678',addr:'台北市大安區信義路',time:'下午 14:00–18:00',pay:'信用卡',items:[{id:1,qty:2},{id:7,qty:1}],status:'pending',created:'今天 09:30'},
-  {id:'#0002',name:'林美玲',phone:'0987-654-321',addr:'新北市板橋區中山路',time:'早上 9:00–12:00',pay:'LINE Pay',items:[{id:4,qty:1},{id:9,qty:1},{id:2,qty:2}],status:'processing',created:'今天 08:15'},
-  {id:'#0003',name:'王大明',phone:'0956-789-012',addr:'桃園市中壢區中正路',time:'晚上 19:00–21:00',pay:'貨到付款',items:[{id:5,qty:2},{id:8,qty:1}],status:'shipped',created:'昨天 16:45'},
-];
-let cart = {};
-let nextId = 4;
-let activeCat = '全部';
-let currentOrderId = null;
-const THRESHOLD = 600, SHIPPING = 60;
-const CATS = ['全部','蔬菜','水果','海鮮','肉品'];
-const STATUS_MAP = {
-  pending:{label:'待處理',cls:'st-pending'},
-  processing:{label:'處理中',cls:'st-processing'},
-  shipped:{label:'已出貨',cls:'st-shipped'},
-  done:{label:'已完成',cls:'st-done'}
-};
-const STATUS_NEXT = {pending:'processing',processing:'shipped',shipped:'done'};
-const STATUS_ACTION = {pending:'開始處理',processing:'標記已出貨',shipped:'確認完成'};
+const SUPA_URL = 'https://ncvndokzrqbewfoimzxw.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jdm5kb2t6cnFiZXdmb2ltenh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDkwNTgsImV4cCI6MjA5NTUyNTA1OH0.GNnQljSNBYkcRaR1WDkWS99tVUV8kSG6NipZE8x6LNk';
+const HEADERS = {'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
 
-// ========== 頁面切換 ==========
-function show(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  if (name === 'cart') renderCart();
-  if (name === 'admin-products') renderAdminProducts();
-  if (name === 'admin-orders') renderOrders();
+async function db(method,table,body,params){
+  let url=`${SUPA_URL}/rest/v1/${table}`;
+  if(params) url+='?'+params;
+  const res=await fetch(url,{method,headers:{...HEADERS,'Prefer':method==='POST'?'return=representation':'return=minimal'},body:body?JSON.stringify(body):undefined});
+  if(!res.ok){const err=await res.text();throw new Error(err);}
+  const text=await res.text();
+  return text?JSON.parse(text):null;
 }
 
-// ========== 購物前台 ==========
-function renderShop() {
-  // 分類篩選按鈕
-  document.getElementById('cat-filters').innerHTML = CATS.map(c =>
-    `<button class="filter-btn${c===activeCat?' active':''}" onclick="filterCat('${c}')">${c}</button>`
-  ).join('');
-  // 商品
-  const list = activeCat === '全部'
-    ? products.filter(p => p.status === 'active')
-    : products.filter(p => p.status === 'active' && p.cat === activeCat);
-  document.getElementById('product-grid').innerHTML = list.map(p => {
-    const stockTag = p.stock === 0
-      ? `<span class="stock-tag stock-out">售完</span>`
-      : p.stock <= 5
-        ? `<span class="stock-tag stock-low">剩${p.stock}</span>`
-        : `<span class="stock-tag stock-ok">庫存${p.stock}</span>`;
-    return `<div class="product-card">
-      <span class="emoji">${p.emoji}</span>
-      <div class="pname">${p.name}</div>
-      <div class="punit">${p.unit}</div>
-      <div class="prow"><span class="pprice">NT$${p.price}</span>${stockTag}</div>
-      <button class="add-btn" ${p.stock===0?'disabled':''} onclick="addCart(${p.id})">${p.stock===0?'已售完':'＋ 加入購物車'}</button>
-    </div>`;
-  }).join('');
-}
-function filterCat(c) { activeCat = c; renderShop(); }
-function addCart(id) {
-  cart[id] = (cart[id] || 0) + 1;
-  updateBadge();
-  const p = products.find(x => x.id == id);
-  // 短暫提示
-  const msg = document.createElement('div');
-  msg.textContent = `✅ ${p.emoji} ${p.name} 已加入購物車`;
-  Object.assign(msg.style, {position:'fixed',bottom:'80px',left:'50%',transform:'translateX(-50%)',background:'var(--green)',color:'#fff',padding:'10px 20px',borderRadius:'99px',fontSize:'14px',fontWeight:'700',zIndex:'999',boxShadow:'0 4px 20px rgba(0,0,0,0.2)',transition:'opacity .3s'});
-  document.body.appendChild(msg);
-  setTimeout(() => { msg.style.opacity = '0'; setTimeout(() => msg.remove(), 300); }, 1800);
-}
-function updateBadge() {
-  document.getElementById('cart-badge').textContent = Object.values(cart).reduce((a,b)=>a+b,0);
+let products=[],orders=[],cart={},activeCat='全部',currentOrderId=null;
+const THRESHOLD=600,SHIPPING=60;
+const CATS=['全部','蔬菜','水果','海鮮','肉品'];
+const STATUS_MAP={pending:{label:'待處理',cls:'st-pending'},processing:{label:'處理中',cls:'st-processing'},shipped:{label:'已出貨',cls:'st-shipped'},done:{label:'已完成',cls:'st-done'}};
+const STATUS_NEXT={pending:'processing',processing:'shipped',shipped:'done'};
+const STATUS_ACTION={pending:'開始處理',processing:'標記已出貨',shipped:'確認完成'};
+
+function toast(msg){const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>{el.style.opacity='0';setTimeout(()=>el.remove(),300);},2000);}
+function updateBadge(){document.getElementById('cart-badge').textContent=Object.values(cart).reduce((a,b)=>a+b,0);}
+function cartTotal(){return Object.entries(cart).reduce((s,[id,qty])=>{const p=products.find(x=>x.id==id);return s+(p?p.price*qty:0);},0);}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+function show(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(name==='cart')renderCart();
+  if(name==='admin-products')loadAndRenderAdminProducts();
+  if(name==='admin-orders')loadAndRenderOrders();
 }
 
-// ========== 購物車 ==========
-function cartTotal() {
-  return Object.entries(cart).reduce((s,[id,qty]) => {
-    const p = products.find(x => x.id == id); return s + (p ? p.price*qty : 0);
-  }, 0);
-}
-function renderCart() {
-  const ids = Object.keys(cart).filter(id => cart[id] > 0);
-  const el = document.getElementById('cart-list');
-  if (!ids.length) {
-    el.innerHTML = `<div class="cart-empty"><span class="big">🛒</span><p>購物車是空的，去挑選商品吧！</p></div>`;
-    document.getElementById('cart-summary').innerHTML = '';
-    return;
+async function loadShop(){
+  try{
+    products=await db('GET','products',null,'status=eq.active&order=created_at.asc')||[];
+    if(products.length===0){
+      const defaults=[
+        {name:'有機花椰菜',emoji:'🥦',price:65,stock:15,cat:'蔬菜',unit:'1顆/約500g',status:'active'},
+        {name:'玉米筍',emoji:'🌽',price:45,stock:8,cat:'蔬菜',unit:'1包/250g',status:'active'},
+        {name:'牛番茄',emoji:'🍅',price:55,stock:20,cat:'蔬菜',unit:'1袋/約600g',status:'active'},
+        {name:'甜心蘋果',emoji:'🍎',price:120,stock:12,cat:'水果',unit:'6顆裝',status:'active'},
+        {name:'愛文芒果',emoji:'🥭',price:160,stock:5,cat:'水果',unit:'3顆裝',status:'active'},
+        {name:'香蕉',emoji:'🍌',price:50,stock:0,cat:'水果',unit:'1串/約700g',status:'active'},
+        {name:'鮭魚切片',emoji:'🐟',price:280,stock:10,cat:'海鮮',unit:'2片/約300g',status:'active'},
+        {name:'白蝦',emoji:'🦐',price:220,stock:6,cat:'海鮮',unit:'1盒/300g',status:'active'},
+        {name:'松阪豬',emoji:'🥩',price:320,stock:4,cat:'肉品',unit:'1份/300g',status:'active'},
+        {name:'雞胸肉',emoji:'🍗',price:180,stock:18,cat:'肉品',unit:'2片/約400g',status:'active'},
+      ];
+      for(const p of defaults) await db('POST','products',p);
+      products=await db('GET','products',null,'status=eq.active&order=created_at.asc')||[];
+    }
+    renderShop();
+  }catch(e){
+    document.getElementById('product-grid').innerHTML=`<p style="color:#b33030;padding:20px">❌ 無法連線資料庫：${e.message}</p>`;
   }
-  el.innerHTML = ids.map(id => {
-    const p = products.find(x => x.id == id); const qty = cart[id];
-    return `<div class="cart-item">
-      <span class="ci-emoji">${p.emoji}</span>
-      <div class="ci-info">
-        <div class="ci-name">${p.name}</div>
-        <div class="ci-price">NT$${p.price} × ${qty} = NT$${p.price*qty}</div>
-      </div>
-      <div class="qty-ctrl">
-        <button class="qty-btn" onclick="chgCart(${id},-1)">−</button>
-        <span class="qty-num">${qty}</span>
-        <button class="qty-btn" onclick="chgCart(${id},1)">＋</button>
-        <button class="btn btn-danger" style="padding:5px 10px" onclick="delCart(${id})">🗑</button>
-      </div>
-    </div>`;
-  }).join('');
-  const total = cartTotal(); const ship = total >= THRESHOLD ? 0 : SHIPPING;
-  const pct = Math.min(100, Math.round(total/THRESHOLD*100));
-  document.getElementById('cart-summary').innerHTML = `
-    <div class="thresh-wrap">
-      <div class="thresh-label"><span>外送門檻進度</span><span>NT$${total} / NT$${THRESHOLD}</span></div>
-      <div class="thresh-track"><div class="thresh-bar" style="width:${pct}%"></div></div>
-      <div class="thresh-msg" style="color:${total>=THRESHOLD?'var(--green)':'var(--muted)'}">
-        ${total>=THRESHOLD ? '🎉 恭喜！已達免費外送門檻' : `再買 NT$${THRESHOLD-total} 即享免費外送`}
-      </div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-row"><span>商品小計</span><span>NT$${total}</span></div>
-      <div class="summary-row"><span>外送費</span><span style="color:${ship===0?'var(--green)':'inherit'}">${ship===0?'🎉 免費':'NT$'+ship}</span></div>
-      <div class="summary-total"><span>總計</span><span>NT$${total+ship}</span></div>
-      <button class="btn btn-primary" style="width:100%;margin-top:14px;padding:12px;font-size:15px;border-radius:10px" onclick="goCheckout()">前往結帳 →</button>
-    </div>`;
 }
-function chgCart(id, d) { cart[id]=(cart[id]||0)+d; if(cart[id]<=0) delete cart[id]; updateBadge(); renderCart(); }
-function delCart(id) { delete cart[id]; updateBadge(); renderCart(); }
 
-// ========== 結帳 ==========
-function goCheckout() {
-  const ids = Object.keys(cart).filter(id => cart[id] > 0);
-  if (!ids.length) return;
+function renderShop(){
+  document.getElementById('cat-filters').innerHTML=CATS.map(c=>`<button class="filter-btn${c===activeCat?' active':''}" onclick="filterCat('${c}')">${c}</button>`).join('');
+  const list=activeCat==='全部'?products:products.filter(p=>p.cat===activeCat);
+  document.getElementById('product-grid').innerHTML=list.map(p=>{
+    const stockTag=p.stock===0?`<span class="stock-tag stock-out">售完</span>`:p.stock<=5?`<span class="stock-tag stock-low">剩${p.stock}</span>`:`<span class="stock-tag stock-ok">庫存${p.stock}</span>`;
+    return `<div class="product-card"><span class="product-emoji">${p.emoji}</span><div class="product-name">${p.name}</div><div class="product-unit">${p.unit}</div><div class="product-row"><span class="product-price">NT$${p.price}</span>${stockTag}</div><button class="add-btn"${p.stock===0?' disabled':''} onclick="addCart(${p.id})">${p.stock===0?'已售完':'＋ 加入購物車'}</button></div>`;
+  }).join('');
+}
+function filterCat(c){activeCat=c;renderShop();}
+function addCart(id){cart[id]=(cart[id]||0)+1;updateBadge();const p=products.find(x=>x.id==id);toast(`✅ ${p.emoji} ${p.name} 已加入購物車`);}
+
+function renderCart(){
+  const ids=Object.keys(cart).filter(id=>cart[id]>0);
+  const el=document.getElementById('cart-list');
+  if(!ids.length){el.innerHTML='<div class="cart-empty"><span class="big">🛒</span><p>購物車是空的</p></div>';document.getElementById('cart-summary').innerHTML='';return;}
+  el.innerHTML=ids.map(id=>{const p=products.find(x=>x.id==id);const qty=cart[id];
+    return `<div class="cart-item"><span class="ci-emoji">${p.emoji}</span><div class="ci-info"><div class="ci-name">${p.name}</div><div class="ci-price">NT$${p.price} × ${qty} = NT$${p.price*qty}</div></div><div class="qty-ctrl"><button class="qty-btn" onclick="chgCart(${id},-1)">−</button><span class="qty-num">${qty}</span><button class="qty-btn" onclick="chgCart(${id},1)">＋</button><button class="btn btn-danger" style="padding:5px 10px" onclick="delCart(${id})">🗑</button></div></div>`;
+  }).join('');
+  const total=cartTotal();const ship=total>=THRESHOLD?0:SHIPPING;const pct=Math.min(100,Math.round(total/THRESHOLD*100));
+  document.getElementById('cart-summary').innerHTML=`<div class="thresh-wrap"><div class="thresh-label"><span>外送門檻</span><span>NT$${total}/NT$${THRESHOLD}</span></div><div class="thresh-track"><div class="thresh-bar" style="width:${pct}%"></div></div><div class="thresh-msg" style="color:${total>=THRESHOLD?'var(--green)':'var(--muted)'}">${total>=THRESHOLD?'🎉 免費外送！':`再買 NT$${THRESHOLD-total} 免運`}</div></div><div class="summary-card"><div class="summary-row"><span>商品小計</span><span>NT$${total}</span></div><div class="summary-row"><span>外送費</span><span style="color:${ship===0?'var(--green)':'inherit'}">${ship===0?'免費':'NT$'+ship}</span></div><div class="summary-total"><span>總計</span><span>NT$${total+ship}</span></div><button class="btn btn-primary" style="width:100%;margin-top:14px;padding:12px;font-size:15px" onclick="goCheckout()">前往結帳 →</button></div>`;
+}
+function chgCart(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];updateBadge();renderCart();}
+function delCart(id){delete cart[id];updateBadge();renderCart();}
+
+function goCheckout(){
+  const ids=Object.keys(cart).filter(id=>cart[id]>0);if(!ids.length)return;
   show('checkout');
-  const total = cartTotal(); const ship = total>=THRESHOLD?0:SHIPPING;
-  document.getElementById('checkout-items').innerHTML = ids.map(id => {
-    const p = products.find(x=>x.id==id);
-    return `<div class="order-line"><span>${p.emoji} ${p.name} ×${cart[id]}</span><span>NT$${p.price*cart[id]}</span></div>`;
-  }).join('');
-  document.getElementById('checkout-total').innerHTML = `<span>總計（含外送）</span><span>NT$${total+ship}</span>`;
-}
-function placeOrder() {
-  const name = document.getElementById('c-name').value.trim();
-  const phone = document.getElementById('c-phone').value.trim();
-  const addr = document.getElementById('c-addr').value.trim();
-  if (!name||!phone||!addr) { alert('⚠️ 請填寫完整的收件資料'); return; }
-  const oid = `#${String(nextId++).padStart(4,'0')}`;
-  const items = Object.entries(cart).map(([id,qty])=>({id:parseInt(id),qty}));
-  const total = cartTotal(); const ship = total>=THRESHOLD?0:SHIPPING;
-  orders.unshift({id:oid,name,phone,addr,time:document.getElementById('c-time').value,pay:document.getElementById('c-pay').value,items,status:'pending',created:'剛剛'});
-  // 扣庫存
-  items.forEach(({id,qty}) => { const p=products.find(x=>x.id==id); if(p) p.stock=Math.max(0,p.stock-qty); });
-  cart = {}; updateBadge();
-  show('success');
-}
-function resetAndShop() { show('shop'); renderShop(); }
-
-// ========== 商品管理後台 ==========
-function renderAdminProducts() {
-  const active = products.filter(p=>p.status==='active').length;
-  const low = products.filter(p=>p.stock>0&&p.stock<=5).length;
-  const out = products.filter(p=>p.stock===0).length;
-  document.getElementById('admin-stats').innerHTML = `
-    <div class="stat-box"><div class="stat-num">${active}</div><div class="stat-lbl">上架中</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:var(--amber)">${low}</div><div class="stat-lbl">庫存偏低</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:var(--red)">${out}</div><div class="stat-lbl">已售完</div></div>`;
-  document.getElementById('admin-prod-list').innerHTML = products.map(p => `
-    <div class="prod-row">
-      <span class="pe">${p.emoji}</span>
-      <div class="pi">
-        <div class="pn">${p.name} <span class="status-tag ${p.status==='active'?'st-active':'st-hidden'}">${p.status==='active'?'上架中':'已下架'}</span></div>
-        <div class="pm">${p.cat} · NT$${p.price} · 庫存：<span style="color:${p.stock===0?'var(--red)':p.stock<=5?'var(--amber)':'inherit'}">${p.stock}</span></div>
-      </div>
-      <div class="pa">
-        <button class="btn" style="font-size:12px;padding:5px 10px" onclick="openEditProduct(${p.id})">✏️ 編輯</button>
-        <button class="btn btn-danger" style="font-size:12px;padding:5px 10px" onclick="toggleProduct(${p.id})">${p.status==='active'?'下架':'上架'}</button>
-      </div>
-    </div>`).join('');
-}
-function openAddProduct() {
-  ['p-name','p-emoji','p-price','p-stock','p-unit','p-edit-id'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('p-status').value='active';
-  document.getElementById('modal-product-title').textContent='新增商品';
-  document.getElementById('modal-product').classList.add('open');
-}
-function openEditProduct(id) {
-  const p = products.find(x=>x.id==id);
-  document.getElementById('p-name').value=p.name;
-  document.getElementById('p-emoji').value=p.emoji;
-  document.getElementById('p-price').value=p.price;
-  document.getElementById('p-stock').value=p.stock;
-  document.getElementById('p-unit').value=p.unit;
-  document.getElementById('p-cat').value=p.cat;
-  document.getElementById('p-status').value=p.status;
-  document.getElementById('p-edit-id').value=p.id;
-  document.getElementById('modal-product-title').textContent='編輯商品';
-  document.getElementById('modal-product').classList.add('open');
-}
-function saveProduct() {
-  const eid = document.getElementById('p-edit-id').value;
-  const data = {
-    name:document.getElementById('p-name').value,
-    emoji:document.getElementById('p-emoji').value||'📦',
-    price:parseInt(document.getElementById('p-price').value)||0,
-    stock:parseInt(document.getElementById('p-stock').value)||0,
-    unit:document.getElementById('p-unit').value,
-    cat:document.getElementById('p-cat').value,
-    status:document.getElementById('p-status').value
-  };
-  if (!data.name) { alert('請填寫商品名稱'); return; }
-  if (eid) { Object.assign(products.find(x=>x.id==eid), data); }
-  else { products.push({id:Date.now(),...data}); }
-  closeModal('modal-product');
-  renderAdminProducts(); renderShop();
-}
-function toggleProduct(id) {
-  const p = products.find(x=>x.id==id);
-  p.status = p.status==='active'?'hidden':'active';
-  renderAdminProducts(); renderShop();
+  const total=cartTotal();const ship=total>=THRESHOLD?0:SHIPPING;
+  document.getElementById('checkout-items').innerHTML=ids.map(id=>{const p=products.find(x=>x.id==id);return `<div class="order-line"><span>${p.emoji} ${p.name} ×${cart[id]}</span><span>NT$${p.price*cart[id]}</span></div>`;}).join('');
+  document.getElementById('checkout-total').innerHTML=`<span>總計（含外送）</span><span>NT$${total+ship}</span>`;
 }
 
-// ========== 訂單管理後台 ==========
-function orderTotal(o) {
-  return o.items.reduce((s,i)=>{const p=products.find(x=>x.id==i.id);return s+(p?p.price*i.qty:0);},0);
+async function placeOrder(){
+  const name=document.getElementById('c-name').value.trim();
+  const phone=document.getElementById('c-phone').value.trim();
+  const addr=document.getElementById('c-addr').value.trim();
+  if(!name||!phone||!addr){alert('⚠️ 請填寫完整收件資料');return;}
+  const btn=document.querySelector('#page-checkout .btn-primary');
+  btn.textContent='儲存中…';btn.disabled=true;
+  try{
+    const total=cartTotal();const ship=total>=THRESHOLD?0:SHIPPING;
+    const oid='#'+Date.now().toString().slice(-6);
+    await db('POST','orders',{id:oid,name,phone,addr,time_slot:document.getElementById('c-time').value,pay_method:document.getElementById('c-pay').value,status:'pending',total,shipping:ship});
+    for(const [id,qty] of Object.entries(cart)){
+      const p=products.find(x=>x.id==id);
+      await db('POST','order_items',{order_id:oid,product_id:parseInt(id),qty,price:p.price});
+      await db('PATCH','products',{stock:Math.max(0,p.stock-qty)},`id=eq.${id}`);
+    }
+    cart={};updateBadge();show('success');
+  }catch(e){alert('❌ 下單失敗：'+e.message);}
+  finally{btn.textContent='✅ 確認下單';btn.disabled=false;}
 }
-function renderOrders() {
-  const filter = document.getElementById('order-filter').value;
-  const list = filter==='all' ? orders : orders.filter(o=>o.status===filter);
-  const pending = orders.filter(o=>o.status==='pending').length;
-  const revenue = orders.reduce((s,o)=>s+orderTotal(o),0);
-  document.getElementById('order-stats').innerHTML = `
-    <div class="stat-box"><div class="stat-num">${orders.length}</div><div class="stat-lbl">總訂單數</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:var(--amber)">${pending}</div><div class="stat-lbl">待處理</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:var(--green)">NT$${revenue}</div><div class="stat-lbl">總營業額</div></div>`;
-  if (!list.length) {
-    document.getElementById('orders-list').innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted)">目前沒有符合的訂單</div>`;
-    return;
-  }
-  document.getElementById('orders-list').innerHTML = list.map(o => {
-    const total=orderTotal(o); const ship=total>=THRESHOLD?0:SHIPPING;
-    return `<div class="order-row" onclick="openOrder('${o.id}')">
-      <div class="or-head">
-        <span class="or-id">${o.id} — ${o.name}</span>
-        <span class="status-tag ${STATUS_MAP[o.status].cls}">${STATUS_MAP[o.status].label}</span>
-      </div>
-      <div class="or-meta">${o.created} · ${o.items.length} 項 · <strong style="color:var(--text)">NT$${total+ship}</strong>${ship===0?' <span style="color:var(--green);font-size:11px;font-weight:700">免運</span>':''}</div>
-    </div>`;
-  }).join('');
+function resetAndShop(){show('shop');loadShop();}
+
+async function loadAndRenderAdminProducts(){
+  document.getElementById('admin-prod-list').innerHTML='<div class="loading"><div class="spin"></div><br>載入中…</div>';
+  try{products=await db('GET','products',null,'order=created_at.asc')||[];renderAdminProducts();}
+  catch(e){document.getElementById('admin-prod-list').innerHTML=`<p style="color:#b33030;padding:20px">❌ ${e.message}</p>`;}
 }
-function openOrder(id) {
-  const o = orders.find(x=>x.id==id); currentOrderId = id;
-  const total=orderTotal(o); const ship=total>=THRESHOLD?0:SHIPPING;
-  const items = o.items.map(i=>{
-    const p=products.find(x=>x.id==i.id);
-    return `<div class="order-line"><span>${p?p.emoji+' '+p.name:'商品'} ×${i.qty}</span><span>NT$${p?p.price*i.qty:0}</span></div>`;
-  }).join('');
-  document.getElementById('order-detail').innerHTML = `
-    <div class="notify-box">
-      <div class="nt">📣 商家通知</div>
-      <div class="nb">訂單 ${o.id} — ${o.name}，共 NT$${total+ship}，${o.time} 配送</div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:14px">
-      <div><span style="color:var(--muted)">客戶：</span>${o.name}</div>
-      <div><span style="color:var(--muted)">電話：</span>${o.phone}</div>
-      <div style="grid-column:1/-1"><span style="color:var(--muted)">地址：</span>${o.addr}</div>
-      <div><span style="color:var(--muted)">時段：</span>${o.time}</div>
-      <div><span style="color:var(--muted)">付款：</span>${o.pay}</div>
-    </div>
-    ${items}
-    <div class="summary-total" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
-      <span>總計</span><span>NT$${total+ship}${ship===0?' <span class="status-tag st-active" style="font-size:11px">免運</span>':''}</span>
-    </div>
-    <div style="margin-top:10px"><span class="status-tag ${STATUS_MAP[o.status].cls}">目前：${STATUS_MAP[o.status].label}</span></div>`;
-  const btn = document.getElementById('order-next-btn');
-  if (STATUS_NEXT[o.status]) { btn.textContent=STATUS_ACTION[o.status]; btn.style.display=''; }
-  else { btn.style.display='none'; }
+function renderAdminProducts(){
+  const active=products.filter(p=>p.status==='active').length;
+  const low=products.filter(p=>p.stock>0&&p.stock<=5).length;
+  const out=products.filter(p=>p.stock===0).length;
+  document.getElementById('admin-stats').innerHTML=`<div class="stat-box"><div class="stat-num">${active}</div><div class="stat-lbl">上架中</div></div><div class="stat-box"><div class="stat-num" style="color:var(--amber)">${low}</div><div class="stat-lbl">庫存偏低</div></div><div class="stat-box"><div class="stat-num" style="color:var(--red)">${out}</div><div class="stat-lbl">已售完</div></div>`;
+  document.getElementById('admin-prod-list').innerHTML=products.map(p=>`<div class="prod-row"><span class="pe">${p.emoji}</span><div class="pi"><div class="pn">${p.name} <span class="status-tag ${p.status==='active'?'st-active':'st-hidden'}">${p.status==='active'?'上架中':'已下架'}</span></div><div class="pm">${p.cat} · NT$${p.price} · 庫存：<span style="color:${p.stock===0?'var(--red)':p.stock<=5?'var(--amber)':'inherit'}">${p.stock}</span></div></div><div class="pa"><button class="btn" style="font-size:12px;padding:5px 10px" onclick="openEditProduct(${p.id})">✏️ 編輯</button><button class="btn btn-danger" style="font-size:12px;padding:5px 10px" onclick="toggleProduct(${p.id})">${p.status==='active'?'下架':'上架'}</button></div></div>`).join('');
+}
+function openAddProduct(){['p-name','p-emoji','p-price','p-stock','p-unit','p-edit-id'].forEach(id=>document.getElementById(id).value='');document.getElementById('p-status').value='active';document.getElementById('modal-product-title').textContent='新增商品';document.getElementById('modal-product').classList.add('open');}
+function openEditProduct(id){const p=products.find(x=>x.id==id);document.getElementById('p-name').value=p.name;document.getElementById('p-emoji').value=p.emoji;document.getElementById('p-price').value=p.price;document.getElementById('p-stock').value=p.stock;document.getElementById('p-unit').value=p.unit;document.getElementById('p-cat').value=p.cat;document.getElementById('p-status').value=p.status;document.getElementById('p-edit-id').value=p.id;document.getElementById('modal-product-title').textContent='編輯商品';document.getElementById('modal-product').classList.add('open');}
+async function saveProduct(){
+  const eid=document.getElementById('p-edit-id').value;
+  const data={name:document.getElementById('p-name').value,emoji:document.getElementById('p-emoji').value||'📦',price:parseInt(document.getElementById('p-price').value)||0,stock:parseInt(document.getElementById('p-stock').value)||0,unit:document.getElementById('p-unit').value,cat:document.getElementById('p-cat').value,status:document.getElementById('p-status').value};
+  if(!data.name){alert('請填寫商品名稱');return;}
+  try{if(eid){await db('PATCH','products',data,`id=eq.${eid}`);}else{await db('POST','products',data);}closeModal('modal-product');toast('✅ 商品已儲存');await loadAndRenderAdminProducts();await loadShop();}
+  catch(e){alert('❌ 儲存失敗：'+e.message);}
+}
+async function toggleProduct(id){const p=products.find(x=>x.id==id);await db('PATCH','products',{status:p.status==='active'?'hidden':'active'},`id=eq.${id}`);toast('✅ 狀態已更新');await loadAndRenderAdminProducts();await loadShop();}
+
+async function loadAndRenderOrders(){
+  document.getElementById('orders-list').innerHTML='<div class="loading"><div class="spin"></div><br>載入中…</div>';
+  try{
+    orders=await db('GET','orders',null,'order=created_at.desc')||[];
+    for(const o of orders){o.items=await db('GET','order_items',null,`order_id=eq.${o.id}`)||[];}
+    renderOrders();
+  }catch(e){document.getElementById('orders-list').innerHTML=`<p style="color:#b33030;padding:20px">❌ ${e.message}</p>`;}
+}
+function renderOrders(){
+  const filter=document.getElementById('order-filter').value;
+  const list=filter==='all'?orders:orders.filter(o=>o.status===filter);
+  const pending=orders.filter(o=>o.status==='pending').length;
+  const revenue=orders.reduce((s,o)=>s+(o.total||0)+(o.shipping||0),0);
+  document.getElementById('order-stats').innerHTML=`<div class="stat-box"><div class="stat-num">${orders.length}</div><div class="stat-lbl">總訂單數</div></div><div class="stat-box"><div class="stat-num" style="color:var(--amber)">${pending}</div><div class="stat-lbl">待處理</div></div><div class="stat-box"><div class="stat-num" style="color:var(--green)">NT$${revenue}</div><div class="stat-lbl">總營業額</div></div>`;
+  if(!list.length){document.getElementById('orders-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">目前沒有訂單</div>';return;}
+  document.getElementById('orders-list').innerHTML=list.map(o=>`<div class="order-row" onclick="openOrder('${o.id}')"><div class="or-head"><span class="or-id">${o.id} — ${o.name}</span><span class="status-tag ${STATUS_MAP[o.status]?.cls||'st-pending'}">${STATUS_MAP[o.status]?.label||o.status}</span></div><div class="or-meta">${new Date(o.created_at).toLocaleString('zh-TW')} · <strong>NT$${(o.total||0)+(o.shipping||0)}</strong>${o.shipping===0?' <span style="color:var(--green);font-size:11px;font-weight:700">免運</span>':''}</div></div>`).join('');
+}
+function openOrder(id){
+  const o=orders.find(x=>x.id==id);currentOrderId=id;
+  const grandTotal=(o.total||0)+(o.shipping||0);
+  const itemsHtml=(o.items||[]).map(i=>{const p=products.find(x=>x.id==i.product_id);return `<div class="order-line"><span>${p?p.emoji+' '+p.name:'商品'} ×${i.qty}</span><span>NT$${i.price*i.qty}</span></div>`;}).join('');
+  document.getElementById('order-detail').innerHTML=`<div class="notify-box"><div class="nt">📣 商家通知</div><div class="nb">訂單 ${o.id} — ${o.name}，共 NT$${grandTotal}，${o.time_slot} 配送</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:14px"><div><span style="color:var(--muted)">客戶：</span>${o.name}</div><div><span style="color:var(--muted)">電話：</span>${o.phone}</div><div style="grid-column:1/-1"><span style="color:var(--muted)">地址：</span>${o.addr}</div><div><span style="color:var(--muted)">時段：</span>${o.time_slot}</div><div><span style="color:var(--muted)">付款：</span>${o.pay_method}</div></div>${itemsHtml}<div class="summary-total" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"><span>總計</span><span>NT$${grandTotal}</span></div><div style="margin-top:10px"><span class="status-tag ${STATUS_MAP[o.status]?.cls||'st-pending'}">目前：${STATUS_MAP[o.status]?.label||o.status}</span></div>`;
+  const btn=document.getElementById('order-next-btn');
+  if(STATUS_NEXT[o.status]){btn.textContent=STATUS_ACTION[o.status];btn.style.display='';}else{btn.style.display='none';}
   document.getElementById('modal-order').classList.add('open');
 }
-function advanceOrder() {
-  const o = orders.find(x=>x.id==currentOrderId);
-  if (o && STATUS_NEXT[o.status]) { o.status=STATUS_NEXT[o.status]; renderOrders(); openOrder(currentOrderId); }
+async function advanceOrder(){
+  const o=orders.find(x=>x.id==currentOrderId);
+  if(o&&STATUS_NEXT[o.status]){try{await db('PATCH','orders',{status:STATUS_NEXT[o.status]},`id=eq.${o.id}`);toast('✅ 狀態已更新');await loadAndRenderOrders();openOrder(currentOrderId);}catch(e){alert('❌ 更新失敗：'+e.message);}}
 }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+async function deleteOrder(){
+  const o=orders.find(x=>x.id==currentOrderId);if(!o)return;
+  if(!confirm(`確定要刪除訂單 ${o.id}（${o.name}）？\n此操作無法復原。`))return;
+  try{await db('DELETE','order_items',null,`order_id=eq.${o.id}`);await db('DELETE','orders',null,`id=eq.${o.id}`);closeModal('modal-order');toast('🗑 訂單已刪除');await loadAndRenderOrders();}
+  catch(e){alert('❌ 刪除失敗：'+e.message);}
+}
 
-// 初始化
-renderShop();
+loadShop();
 </script>
 </body>
 </html>
